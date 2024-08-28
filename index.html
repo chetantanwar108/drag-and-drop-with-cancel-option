@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Good Example - Pointing Device Actions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            text-align: center;
+        }
+        #draggable {
+            width: 100px;
+            height: 100px;
+            background-color: #3498db;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: grab;
+        }
+        #drop-zone {
+            width: 300px;
+            height: 300px;
+            border: 2px dashed #2ecc71;
+            margin: 20px auto;
+            position: relative;
+        }
+        .cancel {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drag-and-Drop with Cancel Option</h1>
+        <div id="draggable">Drag me</div>
+        <div id="drop-zone">Drop here</div>
+        <p id="cancel-message" class="cancel"></p>
+    </div>
+
+    <script>
+        const draggable = document.getElementById('draggable');
+        const dropZone = document.getElementById('drop-zone');
+        const cancelMessage = document.getElementById('cancel-message');
+
+        let isDragging = false;
+        let initialX, initialY, offsetX, offsetY;
+
+        draggable.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            initialX = e.clientX;
+            initialY = e.clientY;
+            offsetX = e.clientX - draggable.getBoundingClientRect().left;
+            offsetY = e.clientY - draggable.getBoundingClientRect().top;
+            cancelMessage.textContent = ''; // Clear any previous cancel message
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
+        });
+
+        function onMouseMove(e) {
+            if (isDragging) {
+                draggable.style.position = 'absolute';
+                draggable.style.left = `${e.clientX - offsetX}px`;
+                draggable.style.top = `${e.clientY - offsetY}px`;
+            }
+        }
+
+        function onMouseUp(e) {
+            if (isDragging) {
+                isDragging = false;
+                document.removeEventListener('mousemove', onMouseMove);
+                document.removeEventListener('mouseup', onMouseUp);
+                // Check if the draggable item is inside the drop zone
+                const dropZoneRect = dropZone.getBoundingClientRect();
+                const draggableRect = draggable.getBoundingClientRect();
+                if (
+                    draggableRect.left >= dropZoneRect.left &&
+                    draggableRect.top >= dropZoneRect.top &&
+                    draggableRect.right <= dropZoneRect.right &&
+                    draggableRect.bottom <= dropZoneRect.bottom
+                ) {
+                    cancelMessage.textContent = 'Item dropped successfully!';
+                } else {
+                    cancelMessage.textContent = 'Drag canceled. Item returned to original position.';
+                    draggable.style.position = 'static'; // Reset to original position
+                }
+            }
+        }
+    </script>
+</body>
+</html>
